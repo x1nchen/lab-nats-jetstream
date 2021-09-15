@@ -6,6 +6,13 @@ TLDR: 这种情况下会拷贝多份相同的数据给不同的 subscription
 
 PS：注意用本地网卡 IP 替换 nats-server-*.conf 配置文件中的 routes 的 IP
 
+example 
+
+```bash
+# macos
+find . -name "nats-server-*.conf" | xargs -L 1 sed -i '' -e "s/10.81.7.58/192.168.50.19/g"
+```
+
 启动测试环境
 
 ```bash

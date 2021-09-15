@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -11,6 +12,10 @@ import (
 
 const DeliverySubject = "ORDER_REPORTING"
 const Inbox = "ORDER_REPORTING"
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func InitPredefinedStreamAndConsumer() (*nats.Conn, error) {
 	nc, err := nats.Connect("127.0.0.1:4222")
@@ -67,7 +72,11 @@ func main() {
 	}()
 
 	subscription, err := nc0.Subscribe(DeliverySubject, func(msg *nats.Msg) {
+		time.Sleep(time.Duration(rand.Intn(2000)) * time.Millisecond)
 		fmt.Printf("consumer[0] [%s] received message: %v\n", time.Now().Format("2006-01-02 15:04:05"), msg.Data)
+		if err := msg.Ack(); err != nil {
+			fmt.Println("consumer[0] ack error", err)
+		}
 	})
 
 	subs = append(subs, subscription)
@@ -82,7 +91,11 @@ func main() {
 
 	// No.2
 	subscription, err = nc1.Subscribe(DeliverySubject, func(msg *nats.Msg) {
+		time.Sleep(time.Duration(rand.Intn(2000)) * time.Millisecond)
 		fmt.Printf("consumer[1] [%s] received message: %v\n", time.Now().Format("2006-01-02 15:04:05"), msg.Data)
+		if err := msg.Ack(); err != nil {
+			fmt.Println("consumer[0] ack error", err)
+		}
 	})
 
 	subs = append(subs, subscription)
@@ -97,7 +110,11 @@ func main() {
 
 	// No.3
 	subscription, err = nc2.Subscribe(DeliverySubject, func(msg *nats.Msg) {
+		time.Sleep(time.Duration(rand.Intn(2000)) * time.Millisecond)
 		fmt.Printf("consumer[2] [%s] received message: %v\n", time.Now().Format("2006-01-02 15:04:05"), msg.Data)
+		if err := msg.Ack(); err != nil {
+			fmt.Println("consumer[0] ack error", err)
+		}
 	})
 
 	subs = append(subs, subscription)
@@ -108,6 +125,7 @@ func main() {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func() {
+
 		defer wg.Done()
 		nc3, err := InitPredefinedStreamAndConsumer()
 		if err != nil {
@@ -125,6 +143,8 @@ func main() {
 			}
 			time.Sleep(1 * time.Second)
 		}
+		// wait all consumer to complete
+		time.Sleep(5 * time.Second)
 	}()
 
 	wg.Wait()
