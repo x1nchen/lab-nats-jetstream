@@ -2,6 +2,8 @@
 
 主要测试特性：在不同的 nats 连接里，使用 Subscribe 方法订阅相同的 Jetstream consumer subject，是否会拷贝多份数据
 
+TLDR: 这种情况下会拷贝多份相同的数据给不同的 subscription
+
 PS：注意用本地网卡 IP 替换 nats-server-*.conf 配置文件中的 routes 的 IP
 
 启动测试环境
