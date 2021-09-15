@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  nats-01:
+    image: nats:2.3-alpine
+    container_name: jetstream-nats-01
+    ports:
+      - 4222:4222
+      - 6222:6222
+      - 8222:8222
+    hostname: "nats-01"
+    command: [ "-c", "/etc/nats-server.conf", "-js", "-sd", "/data" ]
+    volumes:
+      - './nats-server-01.conf:/etc/nats-server.conf'
+      - './jetstream-01-data:/data'
+    env_file: .env
+    # network_mode: "host"
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  nats-02:
+    image: nats:2.3-alpine
+    container_name: jetstream-nats-02
+    ports:
+      - 4223:4222
+      - 6223:6222
+      - 8223:8222
+    hostname: "nats-02"
+    command: [ "-c", "/etc/nats-server.conf", "-js", "-sd", "/data" ]
+    volumes:
+      - './nats-server-02.conf:/etc/nats-server.conf'
+      - './jetstream-02-data:/data'
+    env_file: .env
+    # network_mode: "host"
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  nats-03:
+    image: nats:2.3-alpine
+    container_name: jetstream-nats-03
+    hostname: "nats-03"
+    ports:
+      - 4224:4222
+      - 6224:6222
+      - 8224:8222
+    command: [ "-c", "/etc/nats-server.conf", "-js", "-sd", "/data" ]
+    volumes:
+      - './nats-server-03.conf:/etc/nats-server.conf'
+      - './jetstream-03-data:/data'
+    env_file: .env
+    # network_mode: "host"
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "200k"
+        max-file: "10"
